@@ -2,9 +2,7 @@ from dataclasses import asdict
 
 from django.shortcuts import render
 from django.views import generic
-from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
-from django.core.paginator import Paginator
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -13,6 +11,8 @@ from django.contrib.auth import authenticate, login, logout
 
 from . import omdbapi
 from . import models
+from MovieDatabase.settings import FACEBOOK_REDIRECT_URL
+from . import facebook
 
 
 @login_required
@@ -106,3 +106,23 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('/login')
+
+
+def facebook_login(request):
+    """View used for redirecting to facebook for login"""
+    redirect_uri = request.build_absolute_uri(FACEBOOK_REDIRECT_URL)
+    url = facebook.FacebookLogin.get_url_for_facebook_login(redirect_uri=redirect_uri)
+    return redirect(url)
+
+
+def facebook_manager(request):
+    """View facebook redirects to after login"""
+    redirect_uri = request.build_absolute_uri(FACEBOOK_REDIRECT_URL)
+    code = request.GET.get("code")
+    # If user abandon facebook authentication
+    if code is None:
+        return redirect('/')
+    token = facebook.FacebookLogin.exchange_code_for_token(code, redirect_uri)
+    facebook_profile = facebook.manage_facebook_login(token)
+    login(request, facebook_profile.user)
+    return redirect('/')

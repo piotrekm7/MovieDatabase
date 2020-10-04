@@ -23,6 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'vqd#tx--+$0*qx#_hp$r+5!@c6-y(5r!5wkgu!y0a!pcl9d6fm'
 
+# Facebook keys
+FACEBOOK_CLIENT_ID = '347712026473462'
+FACEBOOK_CLIENT_SECRET = '34c604eaf6483e321fcd929fd940bd03'
+FACEBOOK_REDIRECT_URL = '/facebookmanager'
+
+
+LOGIN_URL = '/login'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

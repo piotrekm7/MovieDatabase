@@ -11,5 +11,7 @@ urlpatterns = [
     path('remove_from_favorites/<str:imdbID>/', views.remove_from_favorites),
     path('register/', views.register_view),
     path('login/', views.login_view),
-    path('logout/', views.logout_view)
+    path('logout/', views.logout_view),
+    path('facebook_login/', views.facebook_login),
+    path('facebook_manager/', views.facebook_manager)
 ]
