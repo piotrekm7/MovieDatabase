@@ -30,6 +30,7 @@
                 <th>imdbID</th>
                 <th>Type</th>
                 <th>Poster</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -40,6 +41,7 @@
                     <td>{{ movie.imdbID }}</td>
                     <td>{{ movie.Type }}</td>
                     <td><img src="{{ movie.Poster }}"></td>
+                    <td><a class="btn btn-primary" href="/add_to_favorites/{{ movie.imdbID }}">Add to favorites</a></td>
                 </tr>
             {% endfor %}
             </tbody>
