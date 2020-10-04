@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block context %}
+    <form action="/search/" method="get">
+        <label for="title">Title</label>
+        <input id="title" type="text" name="title" value="{{ search_phrase }}">
+        <input type="submit" value="Search">
+    </form>
+
+    <h1>Results for: {{ search_phrase }}</h1>
+
+    {% if result %}
+
+        <h2>Current page: {{ page }}</h2>
+        <nav>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link"
+                                         href="/search/?title={{ search_phrase }}&page={{ previous_page }}">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link"
+                                         href="/search/?title={{ search_phrase }}&page={{ next_page }}">Next</a></li>
+            </ul>
+        </nav>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>imdbID</th>
+                <th>Type</th>
+                <th>Poster</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for movie in movies %}
+                <tr>
+                    <td>{{ movie.Title }}</td>
+                    <td>{{ movie.Year }}</td>
+                    <td>{{ movie.imdbID }}</td>
+                    <td>{{ movie.Type }}</td>
+                    <td><img src="{{ movie.Poster }}"></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No results</p>
+    {% endif %}
+{% endblock %}
