@@ -3,13 +3,19 @@ from dataclasses import asdict
 from django.shortcuts import render
 from django.views import generic
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.core.paginator import Paginator
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 
 from . import omdbapi
 from . import models
 
 
+@login_required
 def search_movies(request):
     title = request.GET.get('title', default='')
     page = int(request.GET.get('page', default=1))
@@ -31,17 +37,17 @@ def search_movies(request):
     return render(request, 'search.html', context=context)
 
 
-class Favorites(generic.ListView):
+class Favorites(LoginRequiredMixin, generic.ListView):
     model = models.Movie
     template_name = 'favorites.html'
     context_object_name = 'movies'
     paginate_by = 10
 
     def get_queryset(self):
-        user = get_user_model().objects.filter(username='piotr').first()
-        return models.Movie.objects.filter(favorite__user=user)
+        return models.Movie.objects.filter(favorite__user=self.request.user)
 
 
+@login_required
 def add_to_favorites(request, imdbID: str):
     movie_query = models.Movie.objects.filter(imdbID=imdbID)
     if movie_query.exists():
@@ -50,17 +56,53 @@ def add_to_favorites(request, imdbID: str):
         movie = omdbapi.get_movie(imdbID)
         movie_db = models.Movie.objects.create(**asdict(movie))
 
-    user = get_user_model().objects.filter(username='piotr').first()
-
-    favorite = models.Favorite.objects.filter(user=user, movie=movie_db)
+    favorite = models.Favorite.objects.filter(user=request.user, movie=movie_db)
     if not favorite.exists():
-        models.Favorite.objects.create(user=user, movie=movie_db)
+        models.Favorite.objects.create(user=request.user, movie=movie_db)
 
-    return HttpResponseRedirect('/favorites')
+    return redirect('/favorites')
 
 
+@login_required
 def remove_from_favorites(request, imdbID: str):
-    user = get_user_model().objects.filter(username='piotr').first()
-    models.Favorite.objects.filter(user=user, movie__imdbID=imdbID).delete()
-    return HttpResponseRedirect('/favorites')
+    models.Favorite.objects.filter(user=request.user, movie__imdbID=imdbID).delete()
+    return redirect('/favorites')
 
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password1'])
+            login(request, user)
+            return redirect('/')
+        else:
+            messages.error(request, f"Error: {form.errors.as_data()}")
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'register.html', {'form': form})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                return redirect('/')
+            else:
+                messages.error(request, f"Error: {form.errors.as_data()}")
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'login.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('/login')
