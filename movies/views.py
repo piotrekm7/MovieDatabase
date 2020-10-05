@@ -119,6 +119,7 @@ def facebook_login(request):
 def facebook_manager(request):
     """View facebook redirects to after login"""
     redirect_uri = request.build_absolute_uri(FACEBOOK_REDIRECT_URL)
+    redirect_uri = redirect_uri.replace('http://', 'https://')
     code = request.GET.get("code")
     # If user abandon facebook authentication
     if code is None:
