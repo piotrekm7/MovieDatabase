@@ -36,8 +36,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['moviedatabase.azurewebsites.net', '127.0.0.1']
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
