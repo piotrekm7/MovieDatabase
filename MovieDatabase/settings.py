@@ -26,7 +26,7 @@ SECRET_KEY = 'vqd#tx--+$0*qx#_hp$r+5!@c6-y(5r!5wkgu!y0a!pcl9d6fm'
 # Facebook keys
 FACEBOOK_CLIENT_ID = '347712026473462'
 FACEBOOK_CLIENT_SECRET = '34c604eaf6483e321fcd929fd940bd03'
-FACEBOOK_REDIRECT_URL = '/facebookmanager'
+FACEBOOK_REDIRECT_URL = '/facebook_manager'
 
 
 LOGIN_URL = '/login'
