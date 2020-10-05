@@ -111,6 +111,7 @@ def logout_view(request):
 def facebook_login(request):
     """View used for redirecting to facebook for login"""
     redirect_uri = request.build_absolute_uri(FACEBOOK_REDIRECT_URL)
+    redirect_uri = redirect_uri.replace('http://', 'https://')
     url = facebook.FacebookLogin.get_url_for_facebook_login(redirect_uri=redirect_uri)
     return redirect(url)
 
